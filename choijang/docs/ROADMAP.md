@@ -324,15 +324,16 @@ gantt
 ### Sprint 1 — 기초 인프라 셋업 (Week 1)
 
 **목표:** 개발 환경 완성, 핵심 인프라 구성, DB 스키마 배포
+**상태:** ✅ 완료 (2026-03-13)
 
-| 티켓    | 작업                                                   | 담당   | 완료 기준                                            |
-| ------- | ------------------------------------------------------ | ------ | ---------------------------------------------------- |
-| INF-001 | Next.js 14 + Tailwind CSS 프로젝트 초기화              | 풀스택 | `npm run dev` 정상 실행                              |
-| INF-002 | Vercel 프로젝트 생성 + GitHub CI/CD 연결               | 풀스택 | main 브랜치 푸시 시 자동 배포                        |
-| INF-003 | Supabase 프로젝트 생성 + `analyses` 테이블 스키마 배포 | 백엔드 | 테이블 생성 확인, RLS 정책 초안 적용                 |
-| INF-004 | `credits` 테이블 스키마 생성 (v2 선준비)               | 백엔드 | 테이블 생성 확인                                     |
-| INF-005 | 환경 변수 관리 (.env.local + Vercel 환경 변수)         | 풀스택 | Claude API 키, OpenAI API 키, Supabase URL 설정 완료 |
-| INF-006 | ESLint + Prettier + TypeScript strict 설정             | 풀스택 | 린트 에러 0건                                        |
+| 티켓    | 작업                                                   | 담당   | 완료 기준                                            | 상태 |
+| ------- | ------------------------------------------------------ | ------ | ---------------------------------------------------- | ---- |
+| INF-001 | Next.js 14 + Tailwind CSS 프로젝트 초기화              | 풀스택 | `npm run dev` 정상 실행                              | ✅   |
+| INF-002 | Vercel 프로젝트 생성 + GitHub CI/CD 연결               | 풀스택 | main 브랜치 푸시 시 자동 배포                        | ✅   |
+| INF-003 | Supabase 프로젝트 생성 + `analyses` 테이블 스키마 배포 | 백엔드 | 테이블 생성 확인, RLS 정책 초안 적용                 | ✅   |
+| INF-004 | `credits` 테이블 스키마 생성 (v2 선준비)               | 백엔드 | 테이블 생성 확인                                     | ✅   |
+| INF-005 | 환경 변수 관리 (.env.local + Vercel 환경 변수)         | 풀스택 | Claude API 키, OpenAI API 키, Supabase URL 설정 완료 | ✅   |
+| INF-006 | ESLint + Prettier + TypeScript strict 설정             | 풀스택 | 린트 에러 0건                                        | ✅   |
 
 ---
 
