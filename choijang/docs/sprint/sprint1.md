@@ -8,13 +8,13 @@
 
 ## 개요
 
-| 항목 | 내용 |
-|------|------|
-| 스프린트 번호 | 1 |
-| 기간 | 2026-03-16 ~ 2026-03-20 (5일) |
-| 목표 | 개발 환경 완성, 핵심 인프라 구성, DB 스키마 배포 |
-| 브랜치 | `sprint1` |
-| 선행 조건 | OQ-1(무료 제한 기준), OQ-2(LLM 비용 분석) 의사결정 권장 |
+| 항목          | 내용                                                    |
+| ------------- | ------------------------------------------------------- |
+| 스프린트 번호 | 1                                                       |
+| 기간          | 2026-03-16 ~ 2026-03-20 (5일)                           |
+| 목표          | 개발 환경 완성, 핵심 인프라 구성, DB 스키마 배포        |
+| 브랜치        | `sprint1`                                               |
+| 선행 조건     | OQ-1(무료 제한 기준), OQ-2(LLM 비용 분석) 의사결정 권장 |
 
 ---
 
@@ -55,6 +55,7 @@
 **목표:** 개발 서버가 정상 실행되는 기본 Next.js 14 프로젝트를 생성한다.
 
 **구현 방법:**
+
 1. `choijang/` 디렉토리 내에 `npx create-next-app@latest` 실행
    - TypeScript: Yes
    - ESLint: Yes
@@ -66,6 +67,7 @@
 3. `README.md` 초안 작성 (프로젝트 개요, 실행 방법)
 
 **완료 기준:**
+
 - `npm run dev` 실행 후 `http://localhost:3000` 정상 접속 확인
 - TypeScript 컴파일 에러 0건 (`npm run build`)
 
@@ -78,6 +80,7 @@
 **목표:** `main` 브랜치 푸시 시 Vercel에 자동 배포되는 파이프라인을 구축한다.
 
 **구현 방법:**
+
 1. Vercel 대시보드에서 신규 프로젝트 생성, GitHub 레포지토리 연결
 2. `main` 브랜치: 프로덕션 배포 / `sprint*` 브랜치: 프리뷰 배포 설정
 3. GitHub Actions 워크플로우 파일 생성 (`.github/workflows/ci.yml`)
@@ -85,6 +88,7 @@
 4. Vercel 프로젝트 설정에서 빌드 커맨드, 출력 디렉토리 확인
 
 **완료 기준:**
+
 - `main` 브랜치 푸시 → Vercel 자동 배포 성공 확인
 - GitHub PR 생성 시 Vercel 프리뷰 URL 자동 생성 확인
 - GitHub Actions CI 파이프라인 통과 확인
@@ -98,6 +102,7 @@
 **목표:** 분석 결과를 저장할 `analyses` 테이블을 생성하고 RLS 정책 초안을 적용한다.
 
 **구현 방법:**
+
 1. Supabase 대시보드에서 신규 프로젝트 생성 (리전: ap-northeast-2 Seoul)
 2. `analyses` 테이블 SQL 스키마 작성 및 배포:
 
@@ -148,6 +153,7 @@ CREATE POLICY "서비스 롤 전체 접근"
 4. `supabase/migrations/` 디렉토리에 SQL 파일 버전 관리
 
 **완료 기준:**
+
 - Supabase 대시보드에서 `analyses` 테이블 생성 확인
 - RLS 정책 적용 후 `anon` 키로 직접 SELECT 시 데이터 반환 없음 확인
 - 마이그레이션 파일이 레포지토리에 커밋됨
@@ -161,6 +167,7 @@ CREATE POLICY "서비스 롤 전체 접근"
 **목표:** v2 결제 시스템 연동 시 데이터 마이그레이션 없이 바로 사용 가능한 `credits` 테이블을 미리 생성한다.
 
 **구현 방법:**
+
 1. `credits` 테이블 SQL 스키마 작성 및 배포:
 
 ```sql
@@ -215,6 +222,7 @@ CREATE POLICY "본인 거래 이력 조회"
 ```
 
 **완료 기준:**
+
 - `credits` 및 `credit_transactions` 테이블 생성 확인
 - RLS 정책 적용 확인
 - 마이그레이션 파일 레포지토리 커밋
@@ -228,6 +236,7 @@ CREATE POLICY "본인 거래 이력 조회"
 **목표:** 모든 API 키와 서비스 URL을 안전하게 관리하는 환경 변수 체계를 구축한다.
 
 **구현 방법:**
+
 1. 프로젝트 루트에 `.env.local` 파일 생성 (`.gitignore`에 반드시 포함)
 2. `.env.example` 파일 생성 (실제 값 제외, 키 이름만 포함 — 레포지토리에 커밋):
 
@@ -269,6 +278,7 @@ export function validateEnv() {
 ```
 
 **완료 기준:**
+
 - `.env.local`에 Claude API 키, OpenAI API 키, Supabase URL/키 설정 완료
 - Vercel 환경 변수에 동일 키 설정 완료
 - `.env.local`이 `.gitignore`에 포함되어 레포지토리에 커밋되지 않음 확인
@@ -283,6 +293,7 @@ export function validateEnv() {
 **목표:** 코드 품질 도구를 설정하여 린트 에러 0건, 일관된 코드 스타일을 보장한다.
 
 **구현 방법:**
+
 1. ESLint 설정 강화 (`.eslintrc.json`):
    - `@typescript-eslint/recommended` 규칙 적용
    - `no-console` 경고 (프로덕션 코드)
@@ -328,6 +339,7 @@ export function validateEnv() {
 5. VSCode 설정 (`.vscode/settings.json`) — 저장 시 자동 포맷 적용
 
 **완료 기준:**
+
 - `npm run lint` 실행 결과 에러 0건
 - `npm run format:check` 실행 결과 에러 0건
 - `npm run type-check` 실행 결과 에러 0건
@@ -392,29 +404,29 @@ main 머지 → Vercel 프로덕션 배포 (자동)
 
 ### 외부 의존성
 
-| 의존성 | 설명 | 리스크 |
-|--------|------|--------|
-| Vercel 계정 | 프로젝트 배포에 필요 | 낮음 — 무료 플랜으로 시작 가능 |
-| Supabase 계정 | DB 및 Auth 서비스 | 낮음 — 무료 플랜으로 시작 가능 |
-| Anthropic API 키 | Claude API 호출 (Sprint 2부터 실사용) | 중간 — 키 발급 지연 가능 |
-| OpenAI API 키 | GPT-4o API 호출 (Sprint 2부터 실사용) | 중간 — 키 발급 지연 가능 |
-| GitHub 레포지토리 | CI/CD 연결 필요 | 낮음 |
+| 의존성            | 설명                                  | 리스크                         |
+| ----------------- | ------------------------------------- | ------------------------------ |
+| Vercel 계정       | 프로젝트 배포에 필요                  | 낮음 — 무료 플랜으로 시작 가능 |
+| Supabase 계정     | DB 및 Auth 서비스                     | 낮음 — 무료 플랜으로 시작 가능 |
+| Anthropic API 키  | Claude API 호출 (Sprint 2부터 실사용) | 중간 — 키 발급 지연 가능       |
+| OpenAI API 키     | GPT-4o API 호출 (Sprint 2부터 실사용) | 중간 — 키 발급 지연 가능       |
+| GitHub 레포지토리 | CI/CD 연결 필요                       | 낮음                           |
 
 ### 스프린트 내 리스크
 
-| 리스크 | 발생 가능성 | 영향도 | 완화 방법 |
-|--------|------------|--------|-----------|
-| Vercel SSE 제한 사전 검증 미흡 | 낮음 | 높음 | Sprint 1에서 Vercel Edge Runtime 호환성 사전 조사 |
-| Supabase 무료 티어 설정 제한 | 낮음 | 중간 | 프로젝트 생성 직후 티어 제한 확인 |
-| API 키 Git 노출 | 낮음 | 매우 높음 | `.gitignore` 설정 최우선 처리, PR 리뷰 시 확인 |
-| TypeScript strict 모드 초기 에러 | 중간 | 낮음 | 프로젝트 초기화 직후 즉시 설정하여 누적 방지 |
+| 리스크                           | 발생 가능성 | 영향도    | 완화 방법                                         |
+| -------------------------------- | ----------- | --------- | ------------------------------------------------- |
+| Vercel SSE 제한 사전 검증 미흡   | 낮음        | 높음      | Sprint 1에서 Vercel Edge Runtime 호환성 사전 조사 |
+| Supabase 무료 티어 설정 제한     | 낮음        | 중간      | 프로젝트 생성 직후 티어 제한 확인                 |
+| API 키 Git 노출                  | 낮음        | 매우 높음 | `.gitignore` 설정 최우선 처리, PR 리뷰 시 확인    |
+| TypeScript strict 모드 초기 에러 | 중간        | 낮음      | 프로젝트 초기화 직후 즉시 설정하여 누적 방지      |
 
 ### 선행 의사결정 필요 항목 (OQ)
 
-| 미결 사항 | 중요도 | Sprint 1 영향 |
-|-----------|--------|---------------|
-| OQ-1: 무료 분석 3회 제한 기준 (IP vs 디바이스 vs 계정) | 높음 | Rate Limiting 미들웨어 설계에 영향 (Sprint 2 착수 전 결정 필요) |
-| OQ-2: 멀티 LLM 앙상블 월 비용 분석 | 높음 | Sprint 1 직접 영향 없음, Sprint 2 전 결정 권장 |
+| 미결 사항                                              | 중요도 | Sprint 1 영향                                                   |
+| ------------------------------------------------------ | ------ | --------------------------------------------------------------- |
+| OQ-1: 무료 분석 3회 제한 기준 (IP vs 디바이스 vs 계정) | 높음   | Rate Limiting 미들웨어 설계에 영향 (Sprint 2 착수 전 결정 필요) |
+| OQ-2: 멀티 LLM 앙상블 월 비용 분석                     | 높음   | Sprint 1 직접 영향 없음, Sprint 2 전 결정 권장                  |
 
 ---
 
@@ -456,28 +468,28 @@ Sprint 1이 완료되었다고 판단하려면 아래 항목이 모두 충족되
 
 ## 예상 산출물
 
-| 산출물 | 유형 | 위치 |
-|--------|------|------|
-| Next.js 14 + Tailwind 프로젝트 | 코드 | `choijang/` 루트 |
-| GitHub Actions CI 워크플로우 | 설정 파일 | `.github/workflows/ci.yml` |
-| Supabase 마이그레이션 SQL | DB 스키마 | `supabase/migrations/` |
-| 환경 변수 템플릿 | 설정 파일 | `.env.example` |
-| Supabase 클라이언트 유틸리티 | 코드 | `src/lib/supabase/` |
-| 환경 변수 검증 유틸리티 | 코드 | `src/lib/env.ts` |
-| ESLint + Prettier 설정 | 설정 파일 | `.eslintrc.json`, `.prettierrc` |
-| 프로젝트 README | 문서 | `README.md` |
+| 산출물                         | 유형      | 위치                            |
+| ------------------------------ | --------- | ------------------------------- |
+| Next.js 14 + Tailwind 프로젝트 | 코드      | `choijang/` 루트                |
+| GitHub Actions CI 워크플로우   | 설정 파일 | `.github/workflows/ci.yml`      |
+| Supabase 마이그레이션 SQL      | DB 스키마 | `supabase/migrations/`          |
+| 환경 변수 템플릿               | 설정 파일 | `.env.example`                  |
+| Supabase 클라이언트 유틸리티   | 코드      | `src/lib/supabase/`             |
+| 환경 변수 검증 유틸리티        | 코드      | `src/lib/env.ts`                |
+| ESLint + Prettier 설정         | 설정 파일 | `.eslintrc.json`, `.prettierrc` |
+| 프로젝트 README                | 문서      | `README.md`                     |
 
 ---
 
 ## 일일 작업 계획
 
-| 날짜 | 작업 | 예상 완료 |
-|------|------|-----------|
+| 날짜            | 작업                                                   | 예상 완료              |
+| --------------- | ------------------------------------------------------ | ---------------------- |
 | 2026-03-16 (월) | INF-001: Next.js 초기화 + INF-006: 코드 품질 도구 설정 | INF-001 ✅, INF-006 ✅ |
-| 2026-03-17 (화) | INF-002: Vercel + GitHub CI/CD 연결 | INF-002 ✅ |
-| 2026-03-18 (수) | INF-003: Supabase 프로젝트 + analyses 테이블 | INF-003 ✅ |
-| 2026-03-19 (목) | INF-004: credits 테이블 + INF-005: 환경 변수 관리 | INF-004 ✅, INF-005 ✅ |
-| 2026-03-20 (금) | 전체 완료 기준 검증 + 문서 정리 + Sprint 1 회고 | Sprint 1 완료 |
+| 2026-03-17 (화) | INF-002: Vercel + GitHub CI/CD 연결                    | INF-002 ✅             |
+| 2026-03-18 (수) | INF-003: Supabase 프로젝트 + analyses 테이블           | INF-003 ✅             |
+| 2026-03-19 (목) | INF-004: credits 테이블 + INF-005: 환경 변수 관리      | INF-004 ✅, INF-005 ✅ |
+| 2026-03-20 (금) | 전체 완료 기준 검증 + 문서 정리 + Sprint 1 회고        | Sprint 1 완료          |
 
 ---
 
@@ -499,4 +511,4 @@ Sprint 1이 완료되었다고 판단하려면 아래 항목이 모두 충족되
 
 ---
 
-*Sprint 1 완료 후 Sprint 2 (AI 분석 엔진 백엔드) 착수 전, OQ-1과 OQ-2 미결 사항을 반드시 해소하세요.*
+_Sprint 1 완료 후 Sprint 2 (AI 분석 엔진 백엔드) 착수 전, OQ-1과 OQ-2 미결 사항을 반드시 해소하세요._

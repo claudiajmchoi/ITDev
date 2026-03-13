@@ -28,6 +28,7 @@
 ### Task 1: Next.js 14 프로젝트 초기화 (INF-001)
 
 **Files:**
+
 - Create: `choijang/` 내 Next.js 프로젝트 전체 구조 (`npx create-next-app@latest`)
 - Modify: `src/app/page.tsx` — 기본 내용 최소화
 - Create: `README.md`
@@ -120,6 +121,7 @@ git commit -m "feat: Next.js 14 + Tailwind CSS 프로젝트 초기화 (INF-001)"
 > INF-001 직후 설정해야 코드 누적 전에 규칙을 확립할 수 있다.
 
 **Files:**
+
 - Modify: `choijang/.eslintrc.json`
 - Create: `choijang/.prettierrc`
 - Create: `choijang/.prettierignore`
@@ -131,10 +133,7 @@ git commit -m "feat: Next.js 14 + Tailwind CSS 프로젝트 초기화 (INF-001)"
 
 ```json
 {
-  "extends": [
-    "next/core-web-vitals",
-    "next/typescript"
-  ],
+  "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
@@ -230,6 +229,7 @@ git commit -m "feat: ESLint + Prettier + TypeScript strict 설정 (INF-006)"
 ### Task 3: 환경 변수 관리 체계 구축 (INF-005)
 
 **Files:**
+
 - Create: `choijang/.env.example`
 - Create: `choijang/src/lib/env.ts`
 - Modify: `choijang/.gitignore` — `.env.local` 포함 확인
@@ -333,6 +333,7 @@ git commit -m "feat: 환경 변수 관리 체계 구축 (INF-005)"
 > INF-003/004에서 테이블을 만들기 전에 Supabase 클라이언트를 코드에 먼저 준비한다.
 
 **Files:**
+
 - Create: `choijang/src/lib/supabase/client.ts`
 - Create: `choijang/src/lib/supabase/server.ts`
 - Create: `choijang/src/types/database.ts`
@@ -500,6 +501,7 @@ git commit -m "feat: Supabase 클라이언트 유틸리티 및 DB 타입 정의 
 > Supabase 대시보드에서 직접 SQL을 실행하지 않고, 마이그레이션 파일로 버전 관리한다.
 
 **Files:**
+
 - Create: `choijang/supabase/migrations/20260316_001_create_analyses.sql`
 - Create: `choijang/supabase/migrations/20260316_002_create_credits.sql`
 
@@ -672,6 +674,7 @@ git commit -m "feat: Supabase DB 마이그레이션 SQL 작성 (analyses, credit
 ### Task 6: GitHub Actions CI 워크플로우 생성 (INF-002)
 
 **Files:**
+
 - Create: `choijang/.github/workflows/ci.yml`
 
 > `.github/` 디렉토리는 `choijang/` 이 아닌 레포지토리 루트에 위치해야 GitHub이 인식한다.
@@ -736,6 +739,7 @@ jobs:
 **Step 2: GitHub 레포지토리 Secrets 설정 (수동)**
 
 GitHub 레포 → Settings → Secrets and variables → Actions → New repository secret:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
@@ -783,14 +787,14 @@ git commit -m "docs: Sprint 1 완료 기준 체크리스트 업데이트"
 
 ## 수동 필요 항목 요약 (deploy.md 작성 대상)
 
-| 항목 | 설명 |
-|------|------|
-| Supabase 프로젝트 생성 | 대시보드에서 신규 프로젝트 생성 후 URL/키 복사 |
-| Supabase SQL 실행 | SQL Editor에서 마이그레이션 파일 2개 실행 |
-| Vercel 프로젝트 연결 | GitHub 레포 Import, 루트 디렉토리를 `choijang`으로 설정 |
-| Vercel 환경 변수 설정 | Settings → Environment Variables에 API 키 입력 |
-| GitHub Secrets 설정 | CI 빌드를 위한 API 키 Secrets 등록 |
-| `.env.local` 작성 | `.env.example` 복사 후 실제 키 입력 |
+| 항목                   | 설명                                                    |
+| ---------------------- | ------------------------------------------------------- |
+| Supabase 프로젝트 생성 | 대시보드에서 신규 프로젝트 생성 후 URL/키 복사          |
+| Supabase SQL 실행      | SQL Editor에서 마이그레이션 파일 2개 실행               |
+| Vercel 프로젝트 연결   | GitHub 레포 Import, 루트 디렉토리를 `choijang`으로 설정 |
+| Vercel 환경 변수 설정  | Settings → Environment Variables에 API 키 입력          |
+| GitHub Secrets 설정    | CI 빌드를 위한 API 키 Secrets 등록                      |
+| `.env.local` 작성      | `.env.example` 복사 후 실제 키 입력                     |
 
 ---
 
