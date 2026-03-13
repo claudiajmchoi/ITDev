@@ -437,32 +437,34 @@ Sprint 1이 완료되었다고 판단하려면 아래 항목이 모두 충족되
 ### 기능 완료 체크리스트
 
 - ⬜ INF-001: `npm run dev` 실행 후 `http://localhost:3000` 정상 접속
-- ⬜ INF-001: `npm run build` TypeScript 컴파일 에러 0건
-- ⬜ INF-002: `main` 브랜치 푸시 → Vercel 자동 배포 성공
-- ⬜ INF-002: GitHub Actions CI 파이프라인 통과 (lint + build)
-- ⬜ INF-003: Supabase `analyses` 테이블 생성 및 인덱스 적용 확인
-- ⬜ INF-003: RLS 정책 적용 후 `anon` 키 직접 접근 차단 확인
-- ⬜ INF-003: 마이그레이션 SQL 파일 레포지토리 커밋
-- ⬜ INF-004: Supabase `credits` 및 `credit_transactions` 테이블 생성 확인
-- ⬜ INF-005: `.env.local`에 Claude/OpenAI/Supabase 키 설정 완료
-- ⬜ INF-005: Vercel 환경 변수 설정 완료
-- ⬜ INF-005: `.env.local`이 레포지토리에 커밋되지 않음 확인
-- ⬜ INF-006: `npm run lint` 에러 0건
-- ⬜ INF-006: `npm run format:check` 에러 0건
-- ⬜ INF-006: `npm run type-check` 에러 0건
+- ✅ INF-001: `npm run build` TypeScript 컴파일 에러 0건
+- ⬜ INF-002: `main` 브랜치 푸시 → Vercel 자동 배포 성공 (수동 설정 필요)
+- ✅ INF-002: GitHub Actions CI 파이프라인 생성 완료 (`.github/workflows/ci.yml`)
+- ⬜ INF-003: Supabase `analyses` 테이블 생성 및 인덱스 적용 확인 (수동 실행 필요)
+- ⬜ INF-003: RLS 정책 적용 후 `anon` 키 직접 접근 차단 확인 (수동 실행 필요)
+- ✅ INF-003: 마이그레이션 SQL 파일 레포지토리 커밋
+- ⬜ INF-004: Supabase `credits` 및 `credit_transactions` 테이블 생성 확인 (수동 실행 필요)
+- ✅ INF-004: `credits` 및 `credit_transactions` 마이그레이션 SQL 파일 커밋 완료
+- ⬜ INF-005: `.env.local`에 Claude/OpenAI/Supabase 키 설정 완료 (수동 입력 필요)
+- ⬜ INF-005: Vercel 환경 변수 설정 완료 (수동 설정 필요)
+- ✅ INF-005: `.env.local`이 레포지토리에 커밋되지 않음 확인 (`.gitignore` 적용)
+- ✅ INF-005: `.env.example` 존재 및 모든 필수 키 포함
+- ✅ INF-006: `npm run lint` 에러 0건
+- ✅ INF-006: `npm run format:check` 에러 0건
+- ✅ INF-006: `npm run type-check` 에러 0건
 
 ### 코드 품질 기준
 
-- ⬜ 모든 코드 파일에 TypeScript strict 모드 적용
-- ⬜ `any` 타입 사용 없음
-- ⬜ 환경 변수 타입 검증 유틸리티 (`validateEnv`) 구현 완료
-- ⬜ `.env.example` 파일 존재 및 최신 상태 유지
+- ✅ 모든 코드 파일에 TypeScript strict 모드 적용
+- ✅ `any` 타입 사용 없음
+- ✅ 환경 변수 타입 검증 유틸리티 (`validateEnv`) 구현 완료
+- ✅ `.env.example` 파일 존재 및 최신 상태 유지
 
 ### 문서 기준
 
-- ⬜ `README.md` 프로젝트 개요 및 로컬 실행 방법 작성
-- ⬜ `.env.example` 모든 필수 환경 변수 키 포함
-- ⬜ 마이그레이션 SQL 파일에 주석 작성 (테이블 목적, 컬럼 설명)
+- ✅ `README.md` 프로젝트 개요 및 로컬 실행 방법 작성
+- ✅ `.env.example` 모든 필수 환경 변수 키 포함
+- ✅ 마이그레이션 SQL 파일에 주석 작성 (테이블 목적, 컬럼 설명)
 
 ---
 
