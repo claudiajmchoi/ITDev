@@ -1,153 +1,59 @@
-// SSE 분석 엔드포인트 (BE-001 + BE-008)
-// 파이프라인: Rate Limit → 전처리/윤리 → 오케스트레이터 → 앙상블 → Zone A/B/C 전송 → DB 저장
-export const runtime = 'edge';
+// MVP 분석 엔드포인트 — Claude 단일 호출, JSON 응답
+import { NextRequest, NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
+import type { AnalysisResult } from '@/types/analysis';
 
-import { NextRequest } from 'next/server';
-import { preprocessIdea } from '@/lib/analysis/preprocessor';
-import { runOrchestrator } from '@/lib/analysis/orchestrator';
-import { aggregateResults } from '@/lib/analysis/ensemble';
-import { saveAnalysis } from '@/lib/analysis/storage';
-import { checkRateLimit } from '@/lib/rateLimit';
+const client = new Anthropic({ apiKey: process.env['ANTHROPIC_API_KEY'] });
 
-function sseMessage(event: string, data: unknown): string {
-  return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+const SYSTEM_PROMPT = `당신은 스타트업 아이디어를 평가하는 전문 비즈니스 분석가입니다.
+사용자의 아이디어를 분석하여 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요.
+
+{
+  "score_total": <0~100 정수, 전체 사업화 성공 가능성>,
+  "grade": <"S"|"A"|"B"|"C"|"D">,
+  "score_market": <0~100 정수, 시장성>,
+  "score_competition": <0~100 정수, 경쟁우위>,
+  "score_revenue": <0~100 정수, 수익모델>,
+  "summary": <아이디어 한줄 요약, 20자 이내>,
+  "industry": <업종 분류, 예: SaaS, F&B, 커머스, 핀테크>,
+  "strengths": [<강점1>, <강점2>, <강점3>],
+  "risks": [<리스크1>, <리스크2>, <리스크3>],
+  "actions": [<즉시 실행 액션1>, <액션2>, <액션3>]
 }
 
-export async function POST(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+등급 기준: S(90+), A(75~89), B(60~74), C(45~59), D(44 이하)`;
 
-  // Rate Limit 확인
-  const rateLimitResult = await checkRateLimit(ip);
-  if (!rateLimitResult.success) {
-    return new Response(
-      JSON.stringify({ error: '요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.' }),
-      { status: 429, headers: { 'Content-Type': 'application/json' } },
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json() as { idea?: string };
+    const idea = body.idea?.trim();
+
+    if (!idea || idea.length < 10) {
+      return NextResponse.json({ error: '아이디어를 10자 이상 입력해주세요.' }, { status: 400 });
+    }
+    if (idea.length > 2000) {
+      return NextResponse.json({ error: '아이디어는 2000자 이내로 입력해주세요.' }, { status: 400 });
+    }
+
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: `다음 아이디어를 분석해주세요:\n\n${idea}` }],
+    });
+
+    const content = message.content[0];
+    if (!content || content.type !== 'text') {
+      throw new Error('예상치 못한 응답 형식');
+    }
+
+    const result = JSON.parse(content.text) as AnalysisResult;
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('분석 오류:', error);
+    return NextResponse.json(
+      { error: '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },
+      { status: 500 },
     );
   }
-
-  // 입력 파싱
-  let body: { idea?: string; session_id?: string };
-  try {
-    body = (await request.json()) as { idea?: string; session_id?: string };
-  } catch {
-    return new Response(JSON.stringify({ error: '잘못된 요청 형식입니다.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const idea = body.idea?.trim();
-  const sessionId = body.session_id ?? null;
-
-  if (!idea || idea.length < 10) {
-    return new Response(JSON.stringify({ error: '아이디어를 10자 이상 입력해주세요.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  if (idea.length > 2000) {
-    return new Response(JSON.stringify({ error: '아이디어는 2000자 이내로 입력해주세요.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const encoder = new TextEncoder();
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      const send = (event: string, data: unknown) => {
-        controller.enqueue(encoder.encode(sseMessage(event, data)));
-      };
-
-      try {
-        send('start', { message: '분석을 시작합니다.' });
-
-        // 전처리 + 윤리 필터
-        send('progress', { step: 'preprocess', message: '아이디어를 분석 중입니다...' });
-        const preprocess = await preprocessIdea(idea);
-
-        if (preprocess.ethicsFlag) {
-          send('error', {
-            code: 'ETHICS_VIOLATION',
-            message: preprocess.ethicsReason ?? '이 아이디어는 분석할 수 없습니다.',
-          });
-          controller.close();
-          return;
-        }
-
-        // 오케스트레이터 실행 (Zone A + B 병렬, Zone C 순차)
-        const { market, revenue, insights, errors } = await runOrchestrator(
-          idea,
-          preprocess.industry,
-          (message) => send('progress', { step: 'orchestrate', message }),
-        );
-
-        if (Object.keys(errors).length > 0) {
-          console.warn('오케스트레이터 부분 실패:', errors);
-        }
-
-        // Zone A: 시장성 + 경쟁 분석
-        send('zone_a', {
-          score_market: market.score_market,
-          score_competition: market.score_competition,
-          market_analysis: market.market_analysis,
-          competition_analysis: market.competition_analysis,
-        });
-
-        // Zone B: 수익 모델 분석
-        send('zone_b', {
-          score_revenue: revenue.score_revenue,
-          revenue_model: revenue.revenue_model,
-          revenue_streams: revenue.revenue_streams,
-        });
-
-        // Zone C: 종합 인사이트
-        send('zone_c', {
-          summary: insights.summary,
-          strengths: insights.strengths,
-          risks: insights.risks,
-          actions: insights.actions,
-        });
-
-        // 앙상블 집계
-        const ensemble = aggregateResults(market, revenue, insights, preprocess.industry);
-
-        // 최종 결과
-        send('result', {
-          score_total: ensemble.score_total,
-          grade: ensemble.grade,
-          industry: ensemble.industry,
-        });
-
-        // DB 저장 (실패해도 스트림 계속)
-        const analysisId = await saveAnalysis({
-          ideaInput: idea,
-          sessionId,
-          userId: null,
-          result: ensemble,
-        });
-
-        send('done', { analysis_id: analysisId });
-      } catch (error) {
-        console.error('분석 오류:', error);
-        send('error', {
-          code: 'INTERNAL_ERROR',
-          message: '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        });
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'X-Accel-Buffering': 'no',
-    },
-  });
 }
