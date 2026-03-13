@@ -45,6 +45,7 @@ export interface CreditTransaction {
 }
 
 // Supabase 클라이언트 제네릭 타입
+// GenericSchema 요구 필드: Tables + Views + Functions
 export interface Database {
   public: {
     Tables: {
@@ -52,17 +53,22 @@ export interface Database {
         Row: Analysis;
         Insert: Omit<Analysis, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Analysis, 'id' | 'created_at'>>;
+        Relationships: never[];
       };
       credits: {
         Row: Credit;
         Insert: Omit<Credit, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Credit, 'id' | 'created_at'>>;
+        Relationships: never[];
       };
       credit_transactions: {
         Row: CreditTransaction;
         Insert: Omit<CreditTransaction, 'id' | 'created_at'>;
         Update: never;
+        Relationships: never[];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 }
