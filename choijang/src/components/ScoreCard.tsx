@@ -1,90 +1,363 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import type { AnalysisResult } from '@/types/analysis';
 
-const GRADE_COLOR: Record<string, string> = {
-  S: 'text-purple-600 bg-purple-50 border-purple-200',
-  A: 'text-blue-600 bg-blue-50 border-blue-200',
-  B: 'text-green-600 bg-green-50 border-green-200',
-  C: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-  D: 'text-red-600 bg-red-50 border-red-200',
+const GRADE_CONFIG: Record<string, { label: string; color: string; ring: string; bg: string }> = {
+  S: { label: 'S', color: '#a78bfa', ring: '#7c3aed', bg: 'rgba(124,58,237,0.12)' },
+  A: { label: 'A', color: '#34d399', ring: '#059669', bg: 'rgba(5,150,105,0.12)' },
+  B: { label: 'B', color: '#60a5fa', ring: '#2563eb', bg: 'rgba(37,99,235,0.12)' },
+  C: { label: 'C', color: '#fbbf24', ring: '#d97706', bg: 'rgba(217,119,6,0.12)' },
+  D: { label: 'D', color: '#f87171', ring: '#dc2626', bg: 'rgba(220,38,38,0.12)' },
 };
 
-const SCORE_LABEL: Record<string, string> = {
-  score_market: '시장성',
-  score_competition: '경쟁우위',
-  score_revenue: '수익모델',
-};
+const SCORE_META = [
+  { key: 'score_market' as const, label: '시장성', sub: 'Market Potential' },
+  { key: 'score_competition' as const, label: '경쟁우위', sub: 'Competitive Edge' },
+  { key: 'score_revenue' as const, label: '수익모델', sub: 'Revenue Model' },
+];
+
+function getScoreColor(score: number): string {
+  if (score >= 75) return '#34d399';
+  if (score >= 55) return '#60a5fa';
+  if (score >= 40) return '#fbbf24';
+  return '#f87171';
+}
+
+function CircularGauge({ score, grade }: { score: number; grade: string }) {
+  const [animated, setAnimated] = useState(0);
+  const cfg = GRADE_CONFIG[grade] ?? GRADE_CONFIG['D'];
+  const R = 72;
+  const C = 2 * Math.PI * R;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(score), 100);
+    return () => clearTimeout(timer);
+  }, [score]);
+
+  const offset = C * (1 - animated / 100);
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: 200, height: 200 }}>
+      {/* glow backdrop */}
+      <div
+        className="absolute rounded-full blur-2xl opacity-30"
+        style={{
+          width: 140,
+          height: 140,
+          background: cfg.ring,
+        }}
+      />
+      <svg width={200} height={200} style={{ transform: 'rotate(-90deg)' }}>
+        {/* track */}
+        <circle
+          cx={100}
+          cy={100}
+          r={R}
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth={10}
+        />
+        {/* progress */}
+        <circle
+          cx={100}
+          cy={100}
+          r={R}
+          fill="none"
+          stroke={cfg.ring}
+          strokeWidth={10}
+          strokeLinecap="round"
+          strokeDasharray={C}
+          strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)' }}
+        />
+      </svg>
+      {/* center content */}
+      <div className="absolute flex flex-col items-center justify-center">
+        <span
+          className="font-black leading-none tabular-nums"
+          style={{
+            fontSize: 48,
+            color: '#f8fafc',
+            fontFamily: "'Courier New', monospace",
+            letterSpacing: '-2px',
+          }}
+        >
+          {Math.round(animated)}
+        </span>
+        <span className="text-xs font-semibold tracking-widest mt-0.5" style={{ color: cfg.color }}>
+          GRADE {grade}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function AnimatedBar({ score, delay = 0 }: { score: number; delay?: number }) {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setWidth(score), 200 + delay);
+    return () => clearTimeout(t);
+  }, [score, delay]);
+
+  const color = getScoreColor(score);
+  return (
+    <div
+      className="relative h-1.5 rounded-full overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.07)' }}
+    >
+      <div
+        className="absolute inset-y-0 left-0 rounded-full"
+        style={{
+          width: `${width}%`,
+          background: `linear-gradient(90deg, ${color}99, ${color})`,
+          transition: `width 1.2s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+          boxShadow: `0 0 8px ${color}66`,
+        }}
+      />
+    </div>
+  );
+}
 
 interface Props {
   result: AnalysisResult;
 }
 
 export default function ScoreCard({ result }: Props) {
-  const gradeStyle = GRADE_COLOR[result.grade] ?? GRADE_COLOR['D'];
+  const cfg = GRADE_CONFIG[result.grade] ?? GRADE_CONFIG['D'];
 
   return (
-    <div className="space-y-6">
-      {/* 히어로 점수 */}
-      <div className="text-center p-8 bg-white rounded-2xl shadow-sm border">
-        <p className="text-sm text-gray-500 mb-2">{result.industry}</p>
-        <p className="text-gray-700 font-medium mb-4">{result.summary}</p>
-        <div className="flex items-center justify-center gap-4">
-          <span className="text-7xl font-bold text-gray-900">{result.score_total}</span>
-          <span className={`text-4xl font-bold px-4 py-2 rounded-xl border-2 ${gradeStyle}`}>
-            {result.grade}
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{
+        background: 'linear-gradient(160deg, #0d1424 0%, #0a0f1c 100%)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
+      }}
+    >
+      {/* ── TOP HEADER ── */}
+      <div
+        className="flex items-center justify-between px-6 py-3"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <span
+            className="text-xs font-bold tracking-widest uppercase"
+            style={{ color: '#64748b', fontFamily: 'monospace' }}
+          >
+            ANALYSIS REPORT
+          </span>
+          <span style={{ color: '#1e293b' }}>·</span>
+          <span
+            className="text-xs font-semibold tracking-wider px-2 py-0.5 rounded"
+            style={{
+              color: cfg.color,
+              background: cfg.bg,
+              border: `1px solid ${cfg.color}33`,
+            }}
+          >
+            {result.industry}
           </span>
         </div>
-        <p className="text-sm text-gray-400 mt-2">사업화 성공 가능성 점수</p>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>
+            AI VERIFIED
+          </span>
+        </div>
       </div>
 
-      {/* 차원별 점수 */}
-      <div className="grid grid-cols-3 gap-3">
-        {(['score_market', 'score_competition', 'score_revenue'] as const).map((key) => (
-          <div key={key} className="bg-white rounded-xl p-4 border text-center shadow-sm">
-            <p className="text-xs text-gray-500 mb-1">{SCORE_LABEL[key]}</p>
-            <p className="text-3xl font-bold text-gray-900">{result[key]}</p>
-            <div className="mt-2 h-1.5 bg-gray-100 rounded-full">
-              <div
-                className="h-1.5 bg-blue-500 rounded-full"
-                style={{ width: `${result[key]}%` }}
-              />
-            </div>
+      {/* ── HERO SECTION ── */}
+      <div className="flex flex-col md:flex-row items-center gap-8 px-8 py-8">
+        {/* gauge */}
+        <div className="flex-shrink-0">
+          <CircularGauge score={result.score_total} grade={result.grade} />
+          <p
+            className="text-center text-xs mt-2 tracking-wider"
+            style={{ color: '#475569', fontFamily: 'monospace' }}
+          >
+            TOTAL SCORE / 100
+          </p>
+        </div>
+
+        {/* right info */}
+        <div className="flex-1 w-full">
+          {/* summary */}
+          <h2
+            className="text-xl font-bold mb-1 leading-snug"
+            style={{ color: '#f1f5f9' }}
+          >
+            {result.summary}
+          </h2>
+          <p className="text-sm mb-6" style={{ color: '#64748b' }}>
+            사업화 성공 가능성 종합 평가
+          </p>
+
+          {/* sub-scores */}
+          <div className="space-y-4">
+            {SCORE_META.map(({ key, label, sub }, i) => {
+              const score = result[key];
+              const color = getScoreColor(score);
+              return (
+                <div key={key}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div>
+                      <span className="text-sm font-semibold" style={{ color: '#cbd5e1' }}>
+                        {label}
+                      </span>
+                      <span className="text-xs ml-2" style={{ color: '#475569' }}>
+                        {sub}
+                      </span>
+                    </div>
+                    <span
+                      className="text-sm font-bold tabular-nums"
+                      style={{ color, fontFamily: 'monospace' }}
+                    >
+                      {score}
+                      <span className="text-xs font-normal ml-0.5" style={{ color: '#475569' }}>
+                        /100
+                      </span>
+                    </span>
+                  </div>
+                  <AnimatedBar score={score} delay={i * 150} />
+                </div>
+              );
+            })}
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* 강점 / 리스크 / 액션 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Section title="💪 강점" items={result.strengths} color="green" />
-        <Section title="⚠️ 리스크" items={result.risks} color="red" />
-        <Section title="🚀 액션 아이템" items={result.actions} color="blue" />
+      {/* ── INSIGHTS GRID ── */}
+      <div
+        className="grid grid-cols-1 md:grid-cols-3"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <InsightPanel
+          icon="▲"
+          title="핵심 강점"
+          subtitle="Strengths"
+          items={result.strengths}
+          accent="#34d399"
+          borderRight
+        />
+        <InsightPanel
+          icon="▼"
+          title="주요 리스크"
+          subtitle="Risk Factors"
+          items={result.risks}
+          accent="#f87171"
+          borderRight
+        />
+        <InsightPanel
+          icon="→"
+          title="즉시 실행 액션"
+          subtitle="Action Items"
+          items={result.actions}
+          accent="#60a5fa"
+        />
+      </div>
+
+      {/* ── FOOTER ── */}
+      <div
+        className="px-6 py-3 flex items-center justify-between"
+        style={{
+          background: 'rgba(255,255,255,0.02)',
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+        }}
+      >
+        <span className="text-xs" style={{ color: '#1e293b', fontFamily: 'monospace' }}>
+          POWERED BY CLAUDE AI
+        </span>
+        <div
+          className="flex items-center gap-2 px-3 py-1 rounded-full"
+          style={{ background: cfg.bg, border: `1px solid ${cfg.color}22` }}
+        >
+          <span className="text-xs font-semibold" style={{ color: cfg.color }}>
+            등급 {result.grade}
+          </span>
+          <span className="text-xs" style={{ color: '#475569' }}>
+            — {gradeDescription(result.grade)}
+          </span>
+        </div>
       </div>
     </div>
   );
 }
 
-function Section({
+function InsightPanel({
+  icon,
   title,
+  subtitle,
   items,
-  color,
+  accent,
+  borderRight = false,
 }: {
+  icon: string;
   title: string;
+  subtitle: string;
   items: string[];
-  color: 'green' | 'red' | 'blue';
+  accent: string;
+  borderRight?: boolean;
 }) {
-  const border = { green: 'border-green-100', red: 'border-red-100', blue: 'border-blue-100' }[color];
-  const dot = { green: 'bg-green-400', red: 'bg-red-400', blue: 'bg-blue-400' }[color];
-
   return (
-    <div className={`bg-white rounded-xl p-4 border ${border} shadow-sm`}>
-      <p className="font-semibold text-gray-700 mb-3">{title}</p>
-      <ul className="space-y-2">
+    <div
+      className="p-6"
+      style={{
+        borderRight: borderRight ? '1px solid rgba(255,255,255,0.06)' : undefined,
+      }}
+    >
+      {/* panel header */}
+      <div className="flex items-center gap-2 mb-4">
+        <span
+          className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold flex-shrink-0"
+          style={{ background: `${accent}18`, color: accent }}
+        >
+          {icon}
+        </span>
+        <div>
+          <p className="text-sm font-bold leading-tight" style={{ color: '#e2e8f0' }}>
+            {title}
+          </p>
+          <p className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>
+            {subtitle}
+          </p>
+        </div>
+      </div>
+
+      {/* items */}
+      <ol className="space-y-3">
         {items.map((item, i) => (
-          <li key={i} className="flex gap-2 text-sm text-gray-600">
-            <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
-            {item}
+          <li key={i} className="flex gap-3">
+            <span
+              className="flex-shrink-0 w-5 h-5 rounded text-xs font-bold flex items-center justify-center mt-0.5"
+              style={{
+                background: `${accent}14`,
+                color: accent,
+                fontFamily: 'monospace',
+              }}
+            >
+              {i + 1}
+            </span>
+            <p className="text-sm leading-snug" style={{ color: '#94a3b8' }}>
+              {item}
+            </p>
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   );
+}
+
+function gradeDescription(grade: string): string {
+  const map: Record<string, string> = {
+    S: '최우수 · 즉시 추진 권장',
+    A: '우수 · 추진 적합',
+    B: '양호 · 보완 후 추진',
+    C: '보통 · 신중한 검토 필요',
+    D: '미흡 · 전면 재검토 권장',
+  };
+  return map[grade] ?? '';
 }
