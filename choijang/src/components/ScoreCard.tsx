@@ -268,6 +268,101 @@ export default function ScoreCard({ result }: Props) {
         />
       </div>
 
+      {/* ── MARKET ANALYSIS ── */}
+      {result.market_analysis && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-6 pt-5 pb-2 flex items-center gap-2">
+            <span
+              className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
+              style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24' }}
+            >
+              ◈
+            </span>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#e2e8f0' }}>시장 분석</p>
+              <p className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>Market Analysis</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px mx-6 mb-5"
+            style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10, overflow: 'hidden' }}>
+            {[
+              { label: '시장 규모', value: result.market_analysis.market_size },
+              { label: '성장률', value: result.market_analysis.growth_rate },
+              {
+                label: '트렌드',
+                value: result.market_analysis.trend === 'growing' ? '↑ 성장' : result.market_analysis.trend === 'stable' ? '→ 안정' : '↓ 하락',
+                color: result.market_analysis.trend === 'growing' ? '#34d399' : result.market_analysis.trend === 'stable' ? '#60a5fa' : '#f87171',
+              },
+              { label: '타겟 고객', value: result.market_analysis.target_customer },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="p-4" style={{ background: '#0d1424' }}>
+                <p className="text-xs mb-1" style={{ color: '#475569', fontFamily: 'monospace' }}>{label}</p>
+                <p className="text-sm font-semibold" style={{ color: color ?? '#cbd5e1' }}>{value}</p>
+              </div>
+            ))}
+          </div>
+          <p className="px-6 pb-5 text-sm leading-relaxed" style={{ color: '#64748b' }}>
+            {result.market_analysis.overview}
+          </p>
+        </div>
+      )}
+
+      {/* ── COMPETITOR ANALYSIS ── */}
+      {result.competitors && result.competitors.length > 0 && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-6 pt-5 pb-4 flex items-center gap-2">
+            <span
+              className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
+              style={{ background: 'rgba(248,113,113,0.12)', color: '#f87171' }}
+            >
+              ⊕
+            </span>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#e2e8f0' }}>경쟁 제품 분석</p>
+              <p className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>Competitive Landscape</p>
+            </div>
+          </div>
+          <div className="px-6 pb-5 space-y-3">
+            {result.competitors.map((c, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-4"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className="text-sm font-bold"
+                    style={{ color: '#f1f5f9' }}
+                  >
+                    {c.name}
+                  </span>
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-full font-medium"
+                    style={{
+                      background: c.type === 'direct' ? 'rgba(248,113,113,0.15)' : 'rgba(96,165,250,0.15)',
+                      color: c.type === 'direct' ? '#f87171' : '#60a5fa',
+                      border: `1px solid ${c.type === 'direct' ? '#f8717133' : '#60a5fa33'}`,
+                    }}
+                  >
+                    {c.type === 'direct' ? '직접 경쟁' : '간접 경쟁'}
+                  </span>
+                </div>
+                <p className="text-sm mb-2" style={{ color: '#64748b' }}>{c.description}</p>
+                <div className="flex items-start gap-2">
+                  <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: '#34d399' }}>→</span>
+                  <p className="text-xs" style={{ color: '#34d399' }}>
+                    <span style={{ color: '#475569' }}>공략 포인트: </span>{c.weakness}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── FOOTER ── */}
       <div
         className="px-6 py-3 flex items-center justify-between"

@@ -58,6 +58,14 @@ export function aggregateResults(
     risks: insights.risks,
     actions: insights.actions,
     industry,
+    market_analysis: {
+      market_size: '-',
+      growth_rate: '-',
+      trend: 'stable',
+      target_customer: '-',
+      overview: '',
+    },
+    competitors: [],
     model_meta: {
       models_used: ['claude-haiku-4-5-20251001', 'gpt-4o-mini'],
       consensus_level: consensusLevel,

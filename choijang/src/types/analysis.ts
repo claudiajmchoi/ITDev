@@ -10,6 +10,19 @@ export interface AnalysisResult {
   risks: string[];            // 리스크 3가지
   actions: string[];          // 액션 아이템 3가지
   industry: string;           // 업종
+  market_analysis: {
+    market_size: string;      // 시장 규모 (예: "약 2조원")
+    growth_rate: string;      // 성장률 (예: "연 12% 성장")
+    trend: 'growing' | 'stable' | 'declining';
+    target_customer: string;  // 주요 타겟 고객
+    overview: string;         // 시장 분석 요약 2~3문장
+  };
+  competitors: Array<{
+    name: string;             // 경쟁사/서비스명
+    type: 'direct' | 'indirect';
+    description: string;      // 한줄 설명
+    weakness: string;         // 우리가 파고들 수 있는 약점
+  }>;
 }
 
 // Sprint 2 — 전처리 결과

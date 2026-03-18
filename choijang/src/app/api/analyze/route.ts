@@ -18,10 +18,26 @@ const SYSTEM_PROMPT = `당신은 스타트업 아이디어를 평가하는 전�
   "industry": <업종 분류, 예: SaaS, F&B, 커머스, 핀테크>,
   "strengths": [<강점1>, <강점2>, <강점3>],
   "risks": [<리스크1>, <리스크2>, <리스크3>],
-  "actions": [<즉시 실행 액션1>, <액션2>, <액션3>]
+  "actions": [<즉시 실행 액션1>, <액션2>, <액션3>],
+  "market_analysis": {
+    "market_size": <시장 규모, 예: "국내 약 3조원 규모">,
+    "growth_rate": <성장률, 예: "연 12% 성장">,
+    "trend": <"growing"|"stable"|"declining">,
+    "target_customer": <주요 타겟 고객, 예: "20~35세 직장인">,
+    "overview": <시장 분석 요약 2~3문장>
+  },
+  "competitors": [
+    {
+      "name": <경쟁사 또는 유사 서비스명>,
+      "type": <"direct"|"indirect">,
+      "description": <한줄 설명>,
+      "weakness": <우리가 파고들 수 있는 약점>
+    }
+  ]
 }
 
-등급 기준: S(90+), A(75~89), B(60~74), C(45~59), D(44 이하)`;
+등급 기준: S(90+), A(75~89), B(60~74), C(45~59), D(44 이하)
+competitors는 직접경쟁 2개 + 간접경쟁 1개, 총 3개를 반드시 포함하세요.`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
+      max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: `다음 아이디어를 분석해주세요:\n\n${idea}` }],
     });
