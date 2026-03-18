@@ -283,10 +283,11 @@ export default function ScoreCard({ result }: Props) {
               <p className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>Market Analysis</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px mx-6 mb-5"
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-px mx-6 mb-5"
             style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10, overflow: 'hidden' }}>
             {[
-              { label: '시장 규모', value: result.market_analysis.market_size },
+              { label: '국내 시장', value: result.market_analysis.market_size_domestic },
+              { label: '글로벌 시장', value: result.market_analysis.market_size_global },
               { label: '성장률', value: result.market_analysis.growth_rate },
               {
                 label: '트렌드',
@@ -356,6 +357,61 @@ export default function ScoreCard({ result }: Props) {
                   <p className="text-xs" style={{ color: '#34d399' }}>
                     <span style={{ color: '#475569' }}>공략 포인트: </span>{c.weakness}
                   </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── GLOBAL SERVICES ── */}
+      {result.global_services && result.global_services.length > 0 && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-6 pt-5 pb-4 flex items-center gap-2">
+            <span
+              className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
+              style={{ background: 'rgba(167,139,250,0.12)', color: '#a78bfa' }}
+            >
+              ✦
+            </span>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#e2e8f0' }}>해외 유사 서비스</p>
+              <p className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>Global Benchmarks</p>
+            </div>
+          </div>
+          <div className="px-6 pb-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+            {result.global_services.map((s, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-4"
+                style={{
+                  background: 'rgba(167,139,250,0.05)',
+                  border: '1px solid rgba(167,139,250,0.12)',
+                }}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <span className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{s.name}</span>
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-full flex-shrink-0"
+                    style={{
+                      background: 'rgba(167,139,250,0.15)',
+                      color: '#a78bfa',
+                      border: '1px solid rgba(167,139,250,0.25)',
+                    }}
+                  >
+                    {s.country}
+                  </span>
+                </div>
+                <p className="text-xs mb-2" style={{ color: '#64748b' }}>{s.description}</p>
+                <div
+                  className="text-xs px-2 py-1 rounded mb-2"
+                  style={{ background: 'rgba(251,191,36,0.08)', color: '#fbbf24' }}
+                >
+                  {s.traction}
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: '#a78bfa' }}>→</span>
+                  <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>{s.insight}</p>
                 </div>
               </div>
             ))}

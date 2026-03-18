@@ -11,17 +11,25 @@ export interface AnalysisResult {
   actions: string[];          // 액션 아이템 3가지
   industry: string;           // 업종
   market_analysis: {
-    market_size: string;      // 시장 규모 (예: "약 2조원")
-    growth_rate: string;      // 성장률 (예: "연 12% 성장")
+    market_size_domestic: string;  // 국내 시장 규모 (예: "약 2조원")
+    market_size_global: string;    // 글로벌 시장 규모 (예: "약 120조원")
+    growth_rate: string;           // 성장률 (예: "연 12% 성장")
     trend: 'growing' | 'stable' | 'declining';
-    target_customer: string;  // 주요 타겟 고객
-    overview: string;         // 시장 분석 요약 2~3문장
+    target_customer: string;       // 주요 타겟 고객
+    overview: string;              // 시장 분석 요약 2~3문장
   };
   competitors: Array<{
     name: string;             // 경쟁사/서비스명
     type: 'direct' | 'indirect';
     description: string;      // 한줄 설명
     weakness: string;         // 우리가 파고들 수 있는 약점
+  }>;
+  global_services: Array<{
+    name: string;             // 해외 서비스명
+    country: string;          // 국가 (예: "미국", "일본")
+    description: string;      // 서비스 한줄 설명
+    traction: string;         // 성과/규모 (예: "MAU 500만", "기업가치 1조")
+    insight: string;          // 우리가 배울 수 있는 점
   }>;
 }
 
