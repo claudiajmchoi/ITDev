@@ -43,12 +43,26 @@ const SYSTEM_PROMPT = `당신은 스타트업 아이디어를 평가하는 전�
       "traction": <성과/규모, 예: "MAU 500만", "기업가치 1조원">,
       "insight": <한국 시장에서 배울 수 있는 점>
     }
-  ]
+  ],
+  "global_market": {
+    "overview": <글로벌 시장 전체 요약 2~3문장>,
+    "regions": [
+      {
+        "name": <지역명, 예: "북미", "동남아시아", "유럽", "일본">,
+        "market_size": <해당 지역 시장 규모>,
+        "growth_rate": <성장률>,
+        "maturity": <"emerging"|"growing"|"mature">,
+        "opportunity": <진출 기회 한줄>
+      }
+    ],
+    "entry_strategy": <해외 진출 추천 전략 1~2문장>
+  }
 }
 
 등급 기준: S(90+), A(75~89), B(60~74), C(45~59), D(44 이하)
-- competitors는 직접경쟁 2개 + 간접경쟁 1개, 총 3개 포함
-- global_services는 해외 유사 서비스 3개 포함 (서로 다른 국가 우선)
+- competitors: 직접경쟁 2개 + 간접경쟁 1개, 총 3개
+- global_services: 서로 다른 국가의 유사 서비스 3개
+- global_market.regions: 주요 4개 지역 포함
 - 모든 분석은 실제 존재하는 서비스/데이터 기반으로 작성`;
 
 export async function POST(request: NextRequest) {

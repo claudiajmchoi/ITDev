@@ -419,6 +419,94 @@ export default function ScoreCard({ result }: Props) {
         </div>
       )}
 
+      {/* ── GLOBAL MARKET ── */}
+      {result.global_market && result.global_market.regions.length > 0 && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-6 pt-5 pb-4 flex items-center gap-2">
+            <span
+              className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold"
+              style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399' }}
+            >
+              ◉
+            </span>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#e2e8f0' }}>해외 시장 분석</p>
+              <p className="text-xs" style={{ color: '#475569', fontFamily: 'monospace' }}>Global Market Analysis</p>
+            </div>
+          </div>
+
+          {/* overview */}
+          {result.global_market.overview && (
+            <p className="px-6 pb-4 text-sm leading-relaxed" style={{ color: '#64748b' }}>
+              {result.global_market.overview}
+            </p>
+          )}
+
+          {/* regions */}
+          <div className="px-6 pb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {result.global_market.regions.map((r, i) => {
+              const maturityColor = r.maturity === 'emerging' ? '#fbbf24' : r.maturity === 'growing' ? '#34d399' : '#60a5fa';
+              const maturityLabel = r.maturity === 'emerging' ? '신흥 시장' : r.maturity === 'growing' ? '성장 중' : '성숙 시장';
+              return (
+                <div
+                  key={i}
+                  className="rounded-xl p-4"
+                  style={{
+                    background: 'rgba(52,211,153,0.04)',
+                    border: '1px solid rgba(52,211,153,0.1)',
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-bold" style={{ color: '#e2e8f0' }}>{r.name}</span>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full font-medium"
+                      style={{
+                        background: `${maturityColor}18`,
+                        color: maturityColor,
+                        border: `1px solid ${maturityColor}33`,
+                      }}
+                    >
+                      {maturityLabel}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                      <p className="text-xs mb-0.5" style={{ color: '#475569', fontFamily: 'monospace' }}>시장 규모</p>
+                      <p className="text-xs font-semibold" style={{ color: '#cbd5e1' }}>{r.market_size}</p>
+                    </div>
+                    <div className="rounded-lg p-2" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                      <p className="text-xs mb-0.5" style={{ color: '#475569', fontFamily: 'monospace' }}>성장률</p>
+                      <p className="text-xs font-semibold" style={{ color: maturityColor }}>{r.growth_rate}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: '#34d399' }}>→</span>
+                    <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>{r.opportunity}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* entry strategy */}
+          {result.global_market.entry_strategy && (
+            <div
+              className="mx-6 mb-5 rounded-xl p-4 flex items-start gap-3"
+              style={{
+                background: 'rgba(52,211,153,0.06)',
+                border: '1px solid rgba(52,211,153,0.15)',
+              }}
+            >
+              <span className="text-sm flex-shrink-0" style={{ color: '#34d399' }}>◈</span>
+              <div>
+                <p className="text-xs font-semibold mb-1" style={{ color: '#34d399', fontFamily: 'monospace' }}>추천 진출 전략</p>
+                <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>{result.global_market.entry_strategy}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── FOOTER ── */}
       <div
         className="px-6 py-3 flex items-center justify-between"

@@ -31,6 +31,17 @@ export interface AnalysisResult {
     traction: string;         // 성과/규모 (예: "MAU 500만", "기업가치 1조")
     insight: string;          // 우리가 배울 수 있는 점
   }>;
+  global_market: {
+    overview: string;         // 글로벌 시장 전체 요약 2~3문장
+    regions: Array<{
+      name: string;           // 지역/국가명 (예: "북미", "동남아시아")
+      market_size: string;    // 해당 지역 시장 규모
+      growth_rate: string;    // 성장률
+      maturity: 'emerging' | 'growing' | 'mature'; // 시장 성숙도
+      opportunity: string;    // 진출 기회 한줄
+    }>;
+    entry_strategy: string;   // 해외 진출 추천 전략 1~2문장
+  };
 }
 
 // Sprint 2 — 전처리 결과

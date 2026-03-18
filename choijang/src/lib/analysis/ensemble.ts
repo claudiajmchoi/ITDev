@@ -68,6 +68,11 @@ export function aggregateResults(
     },
     competitors: [],
     global_services: [],
+    global_market: {
+      overview: '',
+      regions: [],
+      entry_strategy: '',
+    },
     model_meta: {
       models_used: ['claude-haiku-4-5-20251001', 'gpt-4o-mini'],
       consensus_level: consensusLevel,
