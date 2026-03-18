@@ -47,7 +47,14 @@ export async function POST(request: NextRequest) {
       throw new Error('예상치 못한 응답 형식');
     }
 
-    const result = JSON.parse(content.text) as AnalysisResult;
+    // 응답 텍스트에서 JSON 블록 추출 시도
+    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Claude 비JSON 응답:', content.text);
+      throw new Error('AI가 올바른 형식으로 응답하지 않았습니다. 다시 시도해주세요.');
+    }
+
+    const result = JSON.parse(jsonMatch[0]) as AnalysisResult;
     return NextResponse.json(result);
   } catch (error) {
     console.error('분석 오류:', error);
