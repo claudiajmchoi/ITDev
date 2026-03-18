@@ -3,13 +3,21 @@
 import { useEffect, useState } from 'react';
 import type { AnalysisResult } from '@/types/analysis';
 
-const GRADE_CONFIG: Record<string, { label: string; color: string; ring: string; bg: string }> = {
+type GradeCfg = { label: string; color: string; ring: string; bg: string };
+
+const DEFAULT_GRADE_CFG: GradeCfg = { label: 'D', color: '#f87171', ring: '#dc2626', bg: 'rgba(220,38,38,0.12)' };
+
+const GRADE_CONFIG: Record<string, GradeCfg> = {
   S: { label: 'S', color: '#a78bfa', ring: '#7c3aed', bg: 'rgba(124,58,237,0.12)' },
   A: { label: 'A', color: '#34d399', ring: '#059669', bg: 'rgba(5,150,105,0.12)' },
   B: { label: 'B', color: '#60a5fa', ring: '#2563eb', bg: 'rgba(37,99,235,0.12)' },
   C: { label: 'C', color: '#fbbf24', ring: '#d97706', bg: 'rgba(217,119,6,0.12)' },
-  D: { label: 'D', color: '#f87171', ring: '#dc2626', bg: 'rgba(220,38,38,0.12)' },
+  D: DEFAULT_GRADE_CFG,
 };
+
+function getCfg(grade: string): GradeCfg {
+  return GRADE_CONFIG[grade] ?? DEFAULT_GRADE_CFG;
+}
 
 const SCORE_META = [
   { key: 'score_market' as const, label: '시장성', sub: 'Market Potential' },
@@ -26,7 +34,7 @@ function getScoreColor(score: number): string {
 
 function CircularGauge({ score, grade }: { score: number; grade: string }) {
   const [animated, setAnimated] = useState(0);
-  const cfg = GRADE_CONFIG[grade] ?? GRADE_CONFIG['D'];
+  const cfg = getCfg(grade);
   const R = 72;
   const C = 2 * Math.PI * R;
 
@@ -45,7 +53,7 @@ function CircularGauge({ score, grade }: { score: number; grade: string }) {
         style={{
           width: 140,
           height: 140,
-          background: cfg.ring,
+          backgroundColor: cfg.ring,
         }}
       />
       <svg width={200} height={200} style={{ transform: 'rotate(-90deg)' }}>
@@ -124,7 +132,7 @@ interface Props {
 }
 
 export default function ScoreCard({ result }: Props) {
-  const cfg = GRADE_CONFIG[result.grade] ?? GRADE_CONFIG['D'];
+  const cfg = getCfg(result.grade);
 
   return (
     <div
